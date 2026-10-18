@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>2048ON!</title>
+  <meta name="description" content="2048ON!: o clássico 2048 com a estética azul ON!. Junte blocos iguais até chegar ao 2048. Grátis e offline." />
+  <meta name="theme-color" content="#007ACC" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <script>/* aplica tema e animações antes de pintar (evita "piscar") */
+  try{var c=JSON.parse(localStorage.getItem('2048on.cfg')||'{}'),d=document.documentElement,r=c.reduzir;
+  if(r===undefined)r=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(c.escuro)d.setAttribute('data-tema','escuro');if(r)d.setAttribute('data-reduzir','1')}catch(e){}</script>
+  <link rel="stylesheet" href="on.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <button id="menu-btn" type="button" aria-label="Abrir menu" aria-controls="drawer" data-abrir="drawer">☰</button>
+    <h1>2048ON!</h1>
+    <button id="howto-btn" class="header-btn" type="button" aria-haspopup="dialog" data-abrir="howto-modal">Como Jogar</button>
+  </header>
+
+  <div id="overlay" hidden></div>
+
+  <!-- Modal "Como Jogar" -->
+  <div id="howto-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2 id="howto-title">Como Jogar 2048ON!</h2>
+        <button class="modal-x" type="button" aria-label="Fechar" data-fechar>✕</button>
+      </div>
+      <div class="modal-body">
+        <h3>O objetivo</h3>
+        <p>O tabuleiro tem 16 casas e começa com dois blocos. Junte blocos com o <strong>mesmo número</strong> para formar blocos maiores, até criar o <strong>2048</strong>. Depois disso dá para continuar jogando e bater o seu recorde.</p>
+
+        <h3>Como mover</h3>
+        <ul>
+          <li>No celular, deslize o dedo em qualquer ponto da área do jogo, para cima, para baixo ou para os lados.</li>
+          <li>No computador, use as setas do teclado ou <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>.</li>
+          <li>Cada movimento empurra todos os blocos até onde der, na direção escolhida.</li>
+        </ul>
+
+        <h3>Como os blocos se juntam</h3>
+        <p>Quando dois blocos iguais se encostam, eles viram um só, com a soma. Exemplo deslizando para a esquerda:</p>
+        <div class="exemplo" aria-label="Exemplo: 2 e 2 viram 4">
+          <span class="ex-cel t2">2</span><span class="ex-cel t2">2</span><span class="ex-cel vazia">·</span><span class="ex-cel vazia">·</span>
+          <span class="ex-seta">→</span>
+          <span class="ex-cel t4">4</span><span class="ex-cel vazia">·</span><span class="ex-cel vazia">·</span><span class="ex-cel vazia">·</span>
+        </div>
+        <p>Algumas regras costumam surpreender:</p>
+        <ul>
+          <li>Cada bloco se junta no máximo <strong>uma vez por movimento</strong>. Uma linha 2 2 2 2 vira 4 4, e não 8.</li>
+          <li>Numa linha 4 2 2, deslizando para a esquerda, os dois 2 viram 4 e o 4 que já estava fica ao lado: 4 4.</li>
+          <li>Blocos diferentes nunca se juntam. Um 2 e um 4 só ficam encostados.</li>
+          <li>Se o movimento não muda nenhum bloco de lugar, nada acontece e nenhum bloco novo aparece.</li>
+        </ul>
+        <div class="exemplo" aria-label="Exemplo: 2 2 2 2 viram 4 4">
+          <span class="ex-cel t2">2</span><span class="ex-cel t2">2</span><span class="ex-cel t2">2</span><span class="ex-cel t2">2</span>
+          <span class="ex-seta">→</span>
+          <span class="ex-cel t4">4</span><span class="ex-cel t4">4</span><span class="ex-cel vazia">·</span><span class="ex-cel vazia">·</span>
+        </div>
+
+        <h3>Depois de cada movimento</h3>
+        <p>Aparece um bloco novo numa casa vazia: quase sempre um 2 (90% das vezes) e às vezes um 4 (10%).</p>
+
+        <h3>Pontuação, vitória e fim de jogo</h3>
+        <ul>
+          <li>Toda vez que dois blocos se juntam, você ganha o valor do bloco novo. Juntar dois 8 dá +16 pontos.</li>
+          <li>O recorde, a maior pontuação que você já fez, fica salvo neste aparelho.</li>
+          <li>A vitória aparece quando você cria o bloco 2048. Toque em "Ver Quadro" para seguir jogando.</li>
+          <li>O jogo termina quando o tabuleiro enche e não existe nenhum movimento possível, ou seja, nenhum par igual encostado.</li>
+        </ul>
+
+        <h3>Estratégia</h3>
+        <ul>
+          <li>Escolha um canto para o seu maior bloco e não deixe ele sair de lá.</li>
+          <li>Use só duas ou três direções, por exemplo esquerda, baixo e direita, e deixe "cima" para emergências.</li>
+          <li>Mantenha a linha de baixo cheia e em ordem decrescente, do maior para o menor.</li>
+          <li>Junte os blocos pequenos cedo. Muitos 2 e 4 espalhados enchem o tabuleiro e travam o jogo.</li>
+          <li>Pense uma jogada à frente: o bloco novo pode surgir em qualquer casa vazia.</li>
+        </ul>
+
+        <h3>Partidas e estatísticas</h3>
+        <p>A partida fica salva automaticamente. No menu ☰ ficam as suas partidas, vitórias, recorde e o maior bloco que você já criou.</p>
+        <div class="dica">Se tocar em Novo jogo (ou apertar <kbd>R</kbd>) no meio de uma partida, o jogo pergunta antes. O recorde nunca se perde.</div>
+        <p class="legenda">Baseado no 2048 de Gabriele Cirulli (licença MIT).</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" type="button" data-fechar data-foco>Entendi!</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div id="game-container">
+      <div class="score-board">
+        <div class="score-box"><span class="label">Pontuação</span><span class="value" id="score">0</span></div>
+        <div class="score-box"><span class="label">Recorde</span><span class="value" id="best">0</span></div>
+      </div>
+      <div id="score-popups"></div>
+
+      <div class="game-container">
+        <div class="game-message">
+          <p></p>
+          <div class="lower">
+            <button class="keep-playing-button" type="button">Ver Quadro</button>
+            <button class="retry-button" type="button">Tentar de novo</button>
+          </div>
+        </div>
+        <div class="grid-container" id="grid-container"></div>
+        <div class="tile-container" id="tile-container"></div>
+      </div>
+
+      <button id="restart-btn" class="btn btn-primary" type="button">Novo jogo</button>
+    </div>
+  </main>
+
+  <footer>
+    <p class="assinatura-final">© Christian, 2026</p>
+  </footer>
+
+  <script src="on.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
