@@ -1,6 +1,6 @@
 /* Service Worker ON!: cache-first para os arquivos do próprio jogo.
    >>> A CADA PUBLICAÇÃO com mudança de arquivo, aumente a versão em CACHE_NAME. <<< */
-const CACHE_NAME = '2048on-v8';
+const CACHE_NAME = '2048on-v9';
 
 const FILES_TO_CACHE = [
   "./",
